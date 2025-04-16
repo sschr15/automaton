@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "automaton",
+  "version": "${version}",
+  "name": "automaton",
+  "description": "Jello mod real",
+  "authors": [],
+  "contact": {},
+  "license": "All-Rights-Reserved",
+  "icon": "assets/automaton/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      "io.siuolplex.automaton.client.AutomatonClient"
+    ],
+    "main": [
+      "io.siuolplex.automaton.Automaton"
+    ]
+  },
+  "mixins": [
+    "automaton.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.0",
+    "fabric": "*",
+    "minecraft": "*"
+  }
+}
+
