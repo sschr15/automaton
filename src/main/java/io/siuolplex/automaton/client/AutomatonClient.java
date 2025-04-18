@@ -103,7 +103,7 @@ public class AutomatonClient implements ClientModInitializer {
                 if (ctx.camera().getEntity() instanceof LocalPlayer player) {
                     float xRot0 = player.initialXRotation(); // Initial X and Y rots for the tick.
                     float yRot0 = player.initialYRotation();
-                    ctx.camera().getEntity().lookAt(EntityAnchorArgument.Anchor.EYES, LOCK_ON.lockedOnEntity().getEyePosition(0)); // Lock eye pos on it, kinda have to do every frame, though I'd prefer not to.
+                    ctx.camera().getEntity().lookAt(EntityAnchorArgument.Anchor.EYES, LOCK_ON.lockedOnEntity().getEyePosition(ctx.tickCounter().getGameTimeDeltaPartialTick(true))); // Lock eye pos on it, kinda have to do every frame, though I'd prefer not to.
                     float xRot = player.getXRot(); // Get rot
                     float yRot = player.getYRot();
                     // Set the rotation to this, again, kinda have to do every frame.
