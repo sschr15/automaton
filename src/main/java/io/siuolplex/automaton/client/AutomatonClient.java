@@ -1,14 +1,17 @@
 package io.siuolplex.automaton.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import io.siuolplex.automaton.Automaton;
 import io.siuolplex.automaton.CameraPoint;
 import io.siuolplex.automaton.EntityLockOn;
 import io.siuolplex.automaton.mixin.GameRendererInvoker;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.gui.components.DebugScreenOverlay;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.network.chat.Component;
@@ -19,6 +22,9 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.lwjgl.glfw.GLFW;
 
+import java.sql.Time;
+import java.time.Instant;
+
 public class AutomatonClient implements ClientModInitializer {
     public static KeyMapping CREATE_CAMERA_POINT_KEY;
     public static KeyMapping TELEPORT_TO_POINT_KEY;
@@ -26,6 +32,8 @@ public class AutomatonClient implements ClientModInitializer {
     public static CameraPoint POINT;
     public static EntityLockOn LOCK_ON;
     private static int tickTimer = 0;
+    public static long current = 0;
+    public static int fps = 0;
 
     @Override
     public void onInitializeClient() {
@@ -53,14 +61,14 @@ public class AutomatonClient implements ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (CREATE_CAMERA_POINT_KEY.consumeClick()) {
                 POINT = CameraPoint.createFromPlayer(client.player);
-                client.player.displayClientMessage(Component.literal("Created Camera Point"), false);
+                client.player.displayClientMessage(Component.translatable("automaton.camera.create_cam_point"), false);
             }
         });
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (TELEPORT_TO_POINT_KEY.consumeClick()) {
                 if (POINT == null) {
-                    client.player.displayClientMessage(Component.literal("No current point to teleport to!"), false);
+                    client.player.displayClientMessage(Component.translatable("automaton.camera.no_valid_point"), false);
                 } else if (!client.player.isSpectator()) {
                     client.player.displayClientMessage(Component.literal("Will not teleport you unless you are in spectator"), false);
                 }
@@ -79,7 +87,7 @@ public class AutomatonClient implements ClientModInitializer {
 
                     if (hit.getType() == HitResult.Type.ENTITY) {
                         LOCK_ON = new EntityLockOn(((EntityHitResult)hit).getEntity());
-                        client.player.displayClientMessage(Component.literal("Locked on to entity " + LOCK_ON.lockedOnEntity().getName()), false);
+                        client.player.displayClientMessage(Component.translatable("Locked on to entity ", LOCK_ON.lockedOnEntity().getName()), false);
                     } else {
                         client.player.displayClientMessage(Component.literal("Could not lock in."), false);
                     }
@@ -90,27 +98,26 @@ public class AutomatonClient implements ClientModInitializer {
             }
         });
 
+        WorldRenderEvents.AFTER_ENTITIES.register(ctx -> {
+            if (LOCK_ON != null && LOCK_ON.verifyLockExistance() && ctx.camera().getEntity().distanceTo(LOCK_ON.lockedOnEntity()) <= 100) {
+                if (ctx.camera().getEntity() instanceof LocalPlayer player) {
+                    float xRot0 = player.initialXRotation(); // Initial X and Y rots for the tick.
+                    float yRot0 = player.initialYRotation();
+                    ctx.camera().getEntity().lookAt(EntityAnchorArgument.Anchor.EYES, LOCK_ON.lockedOnEntity().getEyePosition(0)); // Lock eye pos on it, kinda have to do every frame, though I'd prefer not to.
+                    float xRot = player.getXRot(); // Get rot
+                    float yRot = player.getYRot();
+                    // Set the rotation to this, again, kinda have to do every frame.
+                    player.setXRot(Mth.rotLerp(ctx.tickCounter().getGameTimeDeltaPartialTick(false), xRot0, xRot));
+                    player.setYRot(Mth.rotLerp(ctx.tickCounter().getGameTimeDeltaPartialTick(false), yRot0, yRot));
+                }
+            }
+        });
+
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            if (LOCK_ON != null && LOCK_ON.verifyLockExistance() && client.player.distanceTo(LOCK_ON.lockedOnEntity()) <= 100) {
-                float xRot0 = client.player.getXRot();
-                float yRot0 = client.player.getYRot();
-                client.player.setXRot(xRot0);
-                client.player.setYRot(yRot0);
-
-                client.player.lookAt(EntityAnchorArgument.Anchor.EYES, LOCK_ON.lockedOnEntity().getEyePosition(1f));
-                float xRot = client.player.getXRot();
-                float yRot = client.player.getYRot();
-                client.player.setXRot(Mth.rotLerp(client.getTimer().getRealtimeDeltaTicks(), xRot0, xRot));
-                client.player.setYRot(Mth.rotLerp(client.getTimer().getRealtimeDeltaTicks(), yRot0, yRot));
-
-
-                client.getConnection().send(new ServerboundMovePlayerPacket.Rot(
-                        yRot,
-                        xRot,
-                        client.player.onGround()));
+            if (LOCK_ON != null && LOCK_ON.verifyLockExistance() && client.player != null && client.player.distanceTo(LOCK_ON.lockedOnEntity()) <= 100) {
             } else if (LOCK_ON != null) {
                 LOCK_ON = null;
-                client.player.displayClientMessage(Component.literal("Unlocked camera"), false);
+                if (client.player != null) client.player.displayClientMessage(Component.literal("Unlocked camera"), false);
             }
         });
     }

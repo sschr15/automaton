@@ -2,11 +2,22 @@
   "schemaVersion": 1,
   "id": "automaton",
   "version": "${version}",
-  "name": "automaton",
-  "description": "Jello mod real",
-  "authors": [],
-  "contact": {},
-  "license": "All-Rights-Reserved",
+  "name": "Automaton",
+  "description": "Adds some spectator camera support stuff, made for recording at BC25.",
+  "authors": [
+    {
+      "name": "Siuolplex",
+      "contact": {
+        "bluesky": "https://bsky.app/profile/siuol.bsky.social",
+        "discord": "siuolplex"
+      }
+    }
+  ],
+  "contact": {
+    "issues": "https://github.com/Siuolplex/automaton/issues",
+    "sources": "https://github.com/Siuolplex/automaton/"
+  },
+  "license": "MIT",
   "icon": "assets/automaton/icon.png",
   "environment": "*",
   "entrypoints": {
@@ -24,6 +35,13 @@
     "fabricloader": ">=0.16.0",
     "fabric": "*",
     "minecraft": "*"
+  },
+  "custom": {
+    "loom:injected_interfaces": {
+      "net/minecraft/class_746": [
+        "io/siuolplex/automaton/InitialTickRotations"
+      ]
+    }
   }
 }
 
