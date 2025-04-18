@@ -98,7 +98,7 @@ public class AutomatonClient implements ClientModInitializer {
             }
         });
 
-        WorldRenderEvents.AFTER_ENTITIES.register(ctx -> {
+        WorldRenderEvents.BEFORE_ENTITIES.register(ctx -> {
             if (LOCK_ON != null && LOCK_ON.verifyLockExistance() && ctx.camera().getEntity().distanceTo(LOCK_ON.lockedOnEntity()) <= 100) {
                 if (ctx.camera().getEntity() instanceof LocalPlayer player) {
                     float xRot0 = player.initialXRotation(); // Initial X and Y rots for the tick.
@@ -107,8 +107,8 @@ public class AutomatonClient implements ClientModInitializer {
                     float xRot = player.getXRot(); // Get rot
                     float yRot = player.getYRot();
                     // Set the rotation to this, again, kinda have to do every frame.
-                    player.setXRot(Mth.rotLerp(ctx.tickCounter().getGameTimeDeltaPartialTick(false), xRot0, xRot));
-                    player.setYRot(Mth.rotLerp(ctx.tickCounter().getGameTimeDeltaPartialTick(false), yRot0, yRot));
+                    player.setXRot(Mth.rotLerp(ctx.tickCounter().getGameTimeDeltaPartialTick(true), xRot0, xRot));
+                    player.setYRot(Mth.rotLerp(ctx.tickCounter().getGameTimeDeltaPartialTick(true), yRot0, yRot));
                 }
             }
         });
