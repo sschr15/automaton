@@ -1,5 +1,26 @@
 {
   "automaton.camera.create_cam_point": "Created Camera Point!",
-  "automaton.camera.no_valid_point": "No valid point found!"
+  "automaton.camera.no_valid_point": "No valid point found",
+  "automaton.camera.teleported": "Teleported to point!",
+  "automaton.camera.no_spectator": "Teleporting disabled when not in spectator mode",
+  "automaton.camera.locked_on": "Locked onto %s",
+  "automaton.camera.unlocked": "Unlocked camera",
+  "automaton.camera.unable_to_lock": "Could not lock onto any entity",
+  "automaton.camera.player_not_in_range": "Could not lock onto %s, not in range",
 
+  "category.automaton.keybinds": "Automaton",
+  "key.automaton.create_camera_point": "Create Camera Point",
+  "key.automaton.teleport_to_point": "Teleport to Camera Point",
+  "key.automaton.lock_on": "Follow Currently Watched Player",
+
+  "key.automaton.lock_onto_0": "Follow Player 1",
+  "key.automaton.lock_onto_1": "Follow Player 2",
+  "key.automaton.lock_onto_2": "Follow Player 3",
+  "key.automaton.lock_onto_3": "Follow Player 4",
+  "key.automaton.lock_onto_4": "Follow Player 5",
+  "key.automaton.lock_onto_5": "Follow Player 6",
+  "key.automaton.lock_onto_6": "Follow Player 7",
+  "key.automaton.lock_onto_7": "Follow Player 8",
+  "key.automaton.lock_onto_8": "Follow Player 9",
+  "commands.lockon.set_slot": "Set slot %d to follow %s"
 }
